@@ -3,8 +3,6 @@ package dev.paytrack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -71,14 +69,17 @@ public final class EffectRenderer {
 
     private static void playSound(EffectTier tier) {
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (mc.player == null) {
+            return;
+        }
         SoundEvent sound = switch (tier) {
             case TOAST, JACKPOT -> SoundEvents.ENTITY_PLAYER_LEVELUP;
             case SMALL_FIREWORKS, BIG_FIREWORKS -> SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST;
             case BILLION -> SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH;
         };
         float pitch = tier == EffectTier.BILLION ? 0.6f : 1.0f;
-        // Since 1.21.9 master() takes a registry entry rather than a raw SoundEvent.
-        mc.getSoundManager().play(PositionedSoundInstance.master(RegistryEntry.of(sound), pitch));
+        // Plays on the local player only, so nobody else hears it.
+        mc.player.playSound(sound, 1.0f, pitch);
     }
 
     private static void burst(int baseColor, int count) {
