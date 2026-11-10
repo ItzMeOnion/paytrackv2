@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -76,7 +77,8 @@ public final class EffectRenderer {
             case BILLION -> SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH;
         };
         float pitch = tier == EffectTier.BILLION ? 0.6f : 1.0f;
-        mc.getSoundManager().play(PositionedSoundInstance.master(sound, pitch));
+        // Since 1.21.9 master() takes a registry entry rather than a raw SoundEvent.
+        mc.getSoundManager().play(PositionedSoundInstance.master(RegistryEntry.of(sound), pitch));
     }
 
     private static void burst(int baseColor, int count) {
